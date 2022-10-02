@@ -34,9 +34,9 @@
       (cond
         (or (neg? length) (neg? i)) res
         (= pos length) (recur init (dec i) 0 (conj res word) letr_count nil)
-        :else (let [build (get_letr letr_count words_count i pos prev_index prev_div)
-                    div (first build)
-                    letr_index (second build)
+        :else (let [result (get_letr letr_count words_count i pos prev_index prev_div)
+                    div (first result)
+                    letr_index (second result)
                     new_word (conj word (get letters letr_index))]
                 (recur new_word i (inc pos) res letr_index div))))))
 
