@@ -32,9 +32,21 @@
 
 (defn my-filter [pred coll]
   (reduce (fn [acc item]
-            (concat acc (if (pred item) [item] [])))
+            (concat acc (if (pred item)
+                          [item]
+                          [])))
           '()
           coll))
+
+(defn my-filter2 [pred coll]
+  (reverse (reduce (fn [acc item]
+                     (if (pred item)
+                       (cons item acc)
+                       acc))
+                   '()
+                   coll)))
+
+
 
 ;1.4
 (defn permute2 [alphabet length]
@@ -44,14 +56,15 @@
                     (reduce (fn [result item]
                               (concat item result))
                             '()
-                            (my-map (fn [oldWord]
-                                      (reduce (fn [acc letter]
-                                                (if (= letter (first oldWord))
-                                                  acc
-                                                  (cons (cons letter oldWord) acc)))
-                                              '()
-                                              alphabet))
-                                    oldList)))]
+                            (my-map
+                              (fn [oldWord]
+                                (my-map
+                                  (fn [symbol]
+                                    (cons symbol oldWord))
+                                  (my-filter (fn [letter]
+                                               (not (= letter (first oldWord))) )
+                                     alphabet)))
+                              oldList)))]
       (my-map (fn [x]
                 (apply str x))
               (reduce (fn [acc i]

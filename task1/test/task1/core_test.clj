@@ -71,7 +71,7 @@
 
 (deftest given-test-task1-permute2
   (testing "Тест из задачи"
-    (is (= (permute2 '("a" "b" "c") 2) '("ca" "ba" "cb" "ab" "bc" "ac")))))
+    (is (= (permute2 '("a" "b" "c") 2) '("ac" "bc" "ab" "cb" "ba" "ca")))))
 
 (deftest test-cons1-task1-permute2
   (testing "'(a) 2"
@@ -83,13 +83,13 @@
 
 (deftest test-cons3-task1-permute2
   (testing "'(a b) 2"
-    (is (= (permute2 '(a b) 2) '("ba" "ab")))))
+    (is (= (permute2 '(a b) 2) '("ab" "ba")))))
 
 (deftest test-num-vec-task1-permute2
   (testing "Вектор с числами"
-    (is (= (permute2 [3 2 1] 3) '("131" "231" "121" "321" "132" "232" "212" "312" "123" "323" "213" "313")))))
+    (is (= (permute2 [3 2 1] 3) '("313" "213" "323" "123" "312" "212" "232" "132" "321" "121" "231" "131")))))
 
 (deftest test-number-task1-permute2
   (testing "Работа с числами"
-    (is (= (permute2 [32 1] 2) '("132" "321")))))
+    (is (= (permute2 [32 1] 2) '("321" "132")))))
 
