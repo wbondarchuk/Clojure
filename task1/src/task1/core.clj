@@ -21,7 +21,7 @@
 (defn permute [alphabet length]
   (if (<= length 0)
     '()
-    (permuteAll alphabet alphabet length)))
+    (permuteAll (distinct alphabet) (distinct alphabet) length)))
 
 ;1.3
 (defn my-map [f coll]
@@ -62,8 +62,8 @@
                                   (fn [symbol]
                                     (cons symbol oldWord))
                                   (my-filter (fn [letter]
-                                               (not (= letter (first oldWord))) )
-                                     alphabet)))
+                                               (not (= letter (first oldWord))))
+                                             (distinct alphabet))))
                               oldList)))]
       (my-map (fn [x]
                 (apply str x))

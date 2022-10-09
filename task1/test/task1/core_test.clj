@@ -39,6 +39,16 @@
   (testing "Работа с числами"
     (is (= (permute [32 1] 2) '("321" "132")))))
 
+(deftest test-one-len-task1-permute
+  (testing "Работа с длиной 1"
+    (is (= (permute "ab" 1) '(\a \b)))
+    (is (= (permute "a" 1) '(\a)))))
+
+(deftest test-repeated-alphabet-task1-permute
+  (testing "Работа с алфавитом с повторяющимися символами"
+    (is (= (permute '("a" "b" "a") 2) '("ab" "ba")))
+    (is (= (permute '("a" "b" "a") 1) '("a" "b")))))
+
 ;;Тесты для 1.3
 (deftest test-range6-task1-my-map
   (testing "range 6"
@@ -92,4 +102,14 @@
 (deftest test-number-task1-permute2
   (testing "Работа с числами"
     (is (= (permute2 [32 1] 2) '("321" "132")))))
+
+(deftest test-one-len-task1-permute2
+  (testing "Работа с длиной 1"
+    (is (= (permute2 "ab" 1) '("a" "b")))
+    (is (= (permute2 "a" 1) '("a")))))
+
+(deftest test-repeated-alphabet-task1-permute2
+  (testing "Работа с алфавитом с повторяющимися символами"
+    (is (= (permute2 '("a" "b" "a") 2) '("ab" "ba")))
+    (is (= (permute2 '("a" "b" "a") 1) '("a" "b")))))
 
