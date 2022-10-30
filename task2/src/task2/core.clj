@@ -41,14 +41,14 @@
     (fn [x]
       (integrateTo f integralSteps x delta))))
 
-;; Memoized version without tailed recursion
-;
+;; С мемоизацией
 (def memIntegralStepsRecur
   (memoize (fn [f steps delta res]
-             (if (= steps 1)
-               (+ res (areaByIndices f 0 1 delta))
-               (memIntegralStepsRecur
-                 f (dec steps) delta (+ res (areaByIndices f (dec steps) steps delta)))))))
+             (if (= steps 1) (+ res (areaByIndices f 0 1 delta))
+                             (memIntegralStepsRecur f
+                                                    (dec steps)
+                                                    delta
+                                                    (+ res (areaByIndices f (dec steps) steps delta)))))))
 
 (defn memIntegralSteps  [f steps delta]
   (memIntegralStepsRecur f steps delta 0))
@@ -58,21 +58,50 @@
     (fn [x]
       (integrateTo f memIntegralSteps x delta))))
 
+;; Бесконечная последовательность частичных решений
+(defn valuesForIntegrate [f idx sum delta]
+  (lazy-seq
+    (cons sum
+          (valuesForIntegrate f
+                              (inc idx)
+                              (+ (areaByIndices f idx (inc idx) delta)
+                                 sum)
+                              delta))))
+
+(defn integrateToSeq [f end delta history]
+  (+ (area f (- end (remains end delta)) end)
+     (nth history (steps end delta))))
+
+(defn seqIntegrate [f]
+  (let [delta 0.01
+        history (valuesForIntegrate f 0 0 delta)]
+    (fn [x]
+      (integrateToSeq f x delta history))))
+
+
 (defn -main [& args]
   (time ((integrate lin) 10))
   (time ((integrate lin) 10))
   (time ((integrate lin) 10))
   (time ((memIntegrate lin) 10))
   (time ((memIntegrate lin) 10))
+  (time ((seqIntegrate lin) 10))
+  (time ((seqIntegrate lin) 10))
   (time ((integrate sq) 10))
   (time ((integrate sq) 10))
   (time ((memIntegrate sq) 10))
   (time ((memIntegrate sq) 10))
+  (time ((seqIntegrate sq) 10))
+  (time ((seqIntegrate sq) 10))
   (time ((integrate cube) 10))
   (time ((integrate cube) 10))
   (time ((memIntegrate cube) 10))
   (time ((memIntegrate cube) 10))
+  (time ((seqIntegrate cube) 10))
+  (time ((seqIntegrate cube) 10))
   (time ((integrate sqrt) 10))
   (time ((integrate sqrt) 10))
   (time ((memIntegrate sqrt) 10))
-  (time ((memIntegrate sqrt) 10)))
+  (time ((memIntegrate sqrt) 10))
+  (time ((seqIntegrate sqrt) 10))
+  (time ((seqIntegrate sqrt) 10)))
