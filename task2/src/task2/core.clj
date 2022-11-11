@@ -37,7 +37,7 @@
                     (integrator f (steps end delta) delta))))
 
 (defn integrate [f]
-  (let [delta 1e-5]
+  (let [delta 0.1]
     (fn [x]
       (integrateTo f integralSteps x delta))))
 
@@ -73,35 +73,47 @@
      (nth history (steps end delta))))
 
 (defn seqIntegrate [f]
-  (let [delta 0.01
+  (let [delta 0.1
         history (valuesForIntegrate f 0 0 delta)]
     (fn [x]
       (integrateToSeq f x delta history))))
 
 
 (defn -main [& args]
-  (time ((integrate lin) 10))
-  (time ((integrate lin) 10))
-  (time ((integrate lin) 10))
-  (time ((memIntegrate lin) 10))
-  (time ((memIntegrate lin) 10))
-  (time ((seqIntegrate lin) 10))
-  (time ((seqIntegrate lin) 10))
-  (time ((integrate sq) 10))
-  (time ((integrate sq) 10))
-  (time ((memIntegrate sq) 10))
-  (time ((memIntegrate sq) 10))
-  (time ((seqIntegrate sq) 10))
-  (time ((seqIntegrate sq) 10))
-  (time ((integrate cube) 10))
-  (time ((integrate cube) 10))
-  (time ((memIntegrate cube) 10))
-  (time ((memIntegrate cube) 10))
-  (time ((seqIntegrate cube) 10))
-  (time ((seqIntegrate cube) 10))
-  (time ((integrate sqrt) 10))
-  (time ((integrate sqrt) 10))
-  (time ((memIntegrate sqrt) 10))
-  (time ((memIntegrate sqrt) 10))
-  (time ((seqIntegrate sqrt) 10))
-  (time ((seqIntegrate sqrt) 10)))
+  (println "Integrate")
+  (time ((integrate lin) 100))
+  (time ((integrate lin) 100))
+  (time ((integrate lin) 100))
+  (println "memIntegrate")
+  (time ((memIntegrate lin) 100))
+  (time ((memIntegrate lin) 100))
+  (println "seqIntegrate")
+  (time ((seqIntegrate lin) 100))
+  (time ((seqIntegrate lin) 100))
+  (println "Integrate")
+  (time ((integrate sq) 100))
+  (time ((integrate sq) 100))
+  (println "memIntegrate")
+  (time ((memIntegrate sq) 100))
+  (time ((memIntegrate sq) 100))
+  (println "seqIntegrate")
+  (time ((seqIntegrate sq) 100))
+  (time ((seqIntegrate sq) 100))
+  (println "Integrate")
+  (time ((integrate cube) 100))
+  (time ((integrate cube) 100))
+  (println "memIntegrate")
+  (time ((memIntegrate cube) 100))
+  (time ((memIntegrate cube) 100))
+  (println "seqIntegrate")
+  (time ((seqIntegrate cube) 100))
+  (time ((seqIntegrate cube) 100))
+  (println "Integrate")
+  (time ((integrate sqrt) 100))
+  (time ((integrate sqrt) 100))
+  (println "memIntegrate")
+  (time ((memIntegrate sqrt) 100))
+  (time ((memIntegrate sqrt) 100))
+  (println "seqIntegrate")
+  (time ((seqIntegrate sqrt) 100))
+  (time ((seqIntegrate sqrt) 100)))
