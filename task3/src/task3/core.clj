@@ -37,3 +37,26 @@
   (time (doall (parallelFilter heavy-even? (range 100))))
   (time (doall (parallelFilter heavy-even? (range 100) 100))))
 
+
+
+(defn parts [n coll]
+  (map (partial take n) (iterate (partial drop n) coll)))
+
+(defn parallelFilterInfChunk [pred coll chunkSize batchSize]
+  (->> (parts chunkSize coll)
+       (parts batchSize)
+       (map (fn [batch]
+              (->> (map #(future (doall(filter pred %))) batch)
+                   (doall batchSize)
+                   (map deref))))
+       (apply concat)
+       (apply concat)))
+
+(defn parallelFilterInf
+  ([pred coll chunkSize] (parallelFilterInfChunk pred coll chunkSize (.. Runtime (getRuntime) (availableProcessors))))
+  ([pred coll chunkSize threads] (parallelFilterInfChunk pred coll chunkSize threads)))
+
+(defn -main2 []
+  (time (doall (take 30 (filter heavy-even? (iterate inc 0)))))
+  (time (doall (take 30 (parallelFilterInf heavy-even? (iterate inc 0) 10 10))))
+  (time (doall (take 30 (parallelFilterInf heavy-even? (iterate inc 0) 10)))))
