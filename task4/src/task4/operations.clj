@@ -81,7 +81,7 @@
 (defn conjunction
   "Конъюнкция(&)"
   [expr & rest]
-  (cons ::conj (cons expr rest)))
+  (list ::conj (cons expr rest)))
 
 (defn conjunction?
   "Является ли выражение конъюкцией?"
@@ -91,7 +91,7 @@
 (defn disjunction
   "Дизъюнкция(v)"
   [expr & rest]
-  (cons ::disj (cons expr rest)))
+  (list ::disj (cons expr rest)))
 
 (defn disjunction?
   "Является ли выражение дизъюкцией?"
@@ -101,7 +101,7 @@
 (defn implication
   "Импликация(->)"
   [expr1 expr2]
-  (list ::impl expr1 expr2))
+  (list ::impl (list expr1 expr2)))
 
 (defn implication?
   "Является ли выражение импликацией?"
@@ -118,88 +118,88 @@
   [expr]
   (= (first expr) ::inv))
 
-(defn elementary-function?
-  "Выражение является элементарной функцией?"
-  [expr]
-  (or
-   (constant? expr)
-   (variable? expr)
-   (and
-    (invert? expr)
-    (or
-     (constant? (last expr))
-     (variable? (last expr))))))
+;(defn elementary-function?
+;  "Выражение является элементарной функцией?"
+;  [expr]
+;  (or
+;   (constant? expr)
+;   (variable? expr)
+;   (and
+;    (invert? expr)
+;    (or
+;     (constant? (last expr))
+;     (variable? (last expr))))))
+;
+;(defn dnf?
+;  "Выражение в ДНФ?"
+;  [expr]
+;  (cond (elementary-function? expr) true
+;        (conjunction? expr) (reduce (fn [acc x] (and acc x))
+;                                    (map elementary-function? (args expr)))
+;        (disjunction? expr) (reduce (fn [acc x] (and acc x))
+;                                    (map dnf? (args expr)))
+;        :else false))
+;;
+;(defn de-morgan
+;  "Применить закон Де Моргана на выражение"
+;  [expr]
+;  (if (conjunction? expr)
+;    (disjunction (invert (second expr)) (invert (last expr)))
+;    (conjunction (invert (second expr)) (invert (last expr)))))
+;
+;(defn almost-elementary?
+;  "Является ли выражение элементарным или простой конъюкцией/дизъюнкцией?"
+;  [expr]
+;  (or (elementary-function? expr)
+;      (and (conjunction? expr) (elementary-function? (second expr)) (elementary-function? (last expr)))
+;      (and (disjunction? expr) (elementary-function? (second expr)) (elementary-function? (last expr)))))
+;
 
-(defn dnf?
-  "Выражение в ДНФ?"
-  [expr]
-  (cond (elementary-function? expr) true
-        (conjunction? expr) (reduce (fn [acc x] (and acc x))
-                                    (map elementary-function? (args expr)))
-        (disjunction? expr) (reduce (fn [acc x] (and acc x))
-                                    (map dnf? (args expr)))
-        :else false))
+;(defn distribution
+;  "Распределительный закон"
+;  [expr]
+;  (if (almost-elementary? expr)
+;    expr
+;    (if (conjunction? expr)
+;      (if (disjunction? (last expr))
+;        (disjunction (conjunction (second expr) (second (last expr))) (conjunction (second expr) (last (last expr))))
+;        (disjunction (conjunction (last expr) (second (second expr))) (conjunction (last expr) (last (second expr)))))
+;      (if (conjunction? (last expr))
+;         (conjunction (disjunction (second expr) (second (last expr))) (disjunction (second expr) (last (last expr))))
+;         (conjunction (disjunction (last expr) (second (second expr))) (disjunction (last expr) (last (second expr))))
+;        ))))
+;
+;(defn recur-distribution
+;  "Рекурсивная дистрибутивность"
+;  [expr]
+;  (if (conjunction? expr)
+;    (distribution (conjunction (recur-distribution (second expr)) (recur-distribution (last expr))))
+;    (if (disjunction? expr)
+;      (disjunction (recur-distribution (second expr)) (recur-distribution (last expr)))
+;      expr)))
+;
+;(defn delete-invert
+;  "Применить двойную инверсию"
+;  [expr]
+;  (last (last expr)))
 
-(defn de-morgan
-  "Применить закон Де Моргана на выражение"
-  [expr]
-  (if (conjunction? expr)
-    (disjunction (invert (second expr)) (invert (last expr)))
-    (conjunction (invert (second expr)) (invert (last expr)))))
+;(defn reduceable?
+;  "Проверяет является ли выражение конъюнкцией дизъюнкции или дизъюнкцией конъюнкции"
+;  [expr]
+;  (cond (and (conjunction? expr) (variable? (second expr)) (disjunction? (last expr))) true
+;        (and (conjunction? expr) (variable? (last expr)) (disjunction? (second expr))) true
+;        (and (disjunction? expr) (variable? (last expr)) (conjunction? (second expr))) true
+;        (and (disjunction? expr) (variable? (second expr)) (conjunction? (last expr))) true
+;        :else false
+;        ))
 
-(defn almost-elementary?
-  "Является ли выражение элементарным или простой конъюкцией/дизъюнкцией?"
-  [expr]
-  (or (elementary-function? expr)
-      (and (conjunction? expr) (elementary-function? (second expr)) (elementary-function? (last expr)))
-      (and (disjunction? expr) (elementary-function? (second expr)) (elementary-function? (last expr)))))
-
-
-(defn distribution
-  "Распределительный закон"
-  [expr]
-  (if (almost-elementary? expr)
-    expr
-    (if (conjunction? expr)
-      (if (disjunction? (last expr))
-        (disjunction (conjunction (second expr) (second (last expr))) (conjunction (second expr) (last (last expr))))
-        (disjunction (conjunction (last expr) (second (second expr))) (conjunction (last expr) (last (second expr)))))
-      (if (conjunction? (last expr))
-         (conjunction (disjunction (second expr) (second (last expr))) (disjunction (second expr) (last (last expr))))
-         (conjunction (disjunction (last expr) (second (second expr))) (disjunction (last expr) (last (second expr))))
-        ))))
-
-(defn recur-distribution
-  "Рекурсивная дистрибутивность"
-  [expr]
-  (if (conjunction? expr)
-    (distribution (conjunction (recur-distribution (second expr)) (recur-distribution (last expr))))
-    (if (disjunction? expr)
-      (disjunction (recur-distribution (second expr)) (recur-distribution (last expr)))
-      expr)))
-
-(defn delete-invert
-  "Применить двойную инверсию"
-  [expr]
-  (last (last expr)))
-
-(defn reduceable?
-  "Проверяет является ли выражение конъюнкцией дизъюнкции или дизъюнкцией конъюнкции"
-  [expr]
-  (cond (and (conjunction? expr) (variable? (second expr)) (disjunction? (last expr))) true
-        (and (conjunction? expr) (variable? (last expr)) (disjunction? (second expr))) true
-        (and (disjunction? expr) (variable? (last expr)) (conjunction? (second expr))) true
-        (and (disjunction? expr) (variable? (second expr)) (conjunction? (last expr))) true
-        :else false
-        ))
-
-(defn reducing
-  "Сократить"
-  [expr]
-  (cond (and (conjunction? expr) (variable? (second expr)) (disjunction? (last expr))) (second expr)
-        (and (conjunction? expr) (variable? (last expr)) (disjunction? (second expr))) (last expr)
-        (and (disjunction? expr) (variable? (last expr)) (conjunction? (second expr))) (last expr)
-        (and (disjunction? expr) (variable? (second expr)) (conjunction? (last expr))) (second expr)))
+;(defn reducing
+;  "Сократить"
+;  [expr]
+;  (cond (and (conjunction? expr) (variable? (second expr)) (disjunction? (last expr))) (second expr)
+;        (and (conjunction? expr) (variable? (last expr)) (disjunction? (second expr))) (last expr)
+;        (and (disjunction? expr) (variable? (last expr)) (conjunction? (second expr))) (last expr)
+;        (and (disjunction? expr) (variable? (second expr)) (conjunction? (last expr))) (second expr)))
 
 
 (defmulti expr-evaluator (fn [expr _] (get-expr-type expr)))
@@ -217,4 +217,81 @@
 (defmethod expr-evaluator ::inv [inv-expr variables]
   (let [expr (expr-value inv-expr ::inv)]
     (not (expr-evaluator expr variables))))
+
+(declare invertExp)
+
+(defmulti elementary-function
+          "Избавиться от всех логических операций, содержащихся в формуле, заменив их основными"
+          (fn [expr] (get-expr-type expr)))
+(defmethod elementary-function ::c [exp] exp)
+(defmethod elementary-function ::var [exp] exp)
+(defmethod elementary-function ::conj [exp]
+  (let [[exp1 exp2] (expr-value exp ::conj)]
+    (conjunction (elementary-function exp1) (elementary-function exp2))))
+(defmethod elementary-function ::disj [exp]
+  (let [[exp1 exp2] (expr-value exp ::disj)]
+    (disjunction (elementary-function exp1) (elementary-function exp2))))
+(defmethod elementary-function ::impl [exp]
+  (let [[exp1 exp2] (expr-value exp ::impl)]
+    (disjunction (invert exp1) exp2)))
+(defmethod elementary-function ::inv [exp]
+  (invertExp (elementary-function (expr-value exp ::inv))))
+
+(defmulti invertExp
+          "Заменить знак отрицания, относящийся ко всему выражению, знаками отрицания, относящимися к отдельным переменным высказываниям на основании формул"
+          (fn [expr] (get-expr-type expr)))
+(defmethod invertExp ::c [exp] (invert exp))
+(defmethod invertExp ::var [exp] (invert exp))
+(defmethod invertExp ::conj [exp]
+  (let [[exp1 exp2] (expr-value exp ::conj)]
+    (disjunction (invertExp exp1) (invertExp exp2))))
+(defmethod invertExp ::disj [exp]
+  (let [[exp1 exp2] (expr-value exp ::disj)]
+    (conjunction (invertExp exp1) (invertExp exp2))))
+(defmethod invertExp ::inv [exp]
+  (elementary-function (expr-value exp ::inv)))
+
+(defmulti distribution
+          "Применить свойство дистрибутивности"
+          (fn [exp] (get-expr-type exp)))
+(defmethod distribution ::c [exp] exp)
+(defmethod distribution ::var [exp] exp)
+(defmethod distribution ::inv [exp] exp)
+(defmethod distribution ::disj [exp]
+  (let [[exp1 exp2] (expr-value exp ::disj)
+        exp1 (distribution exp1)
+        exp2 (distribution exp2)]
+    (cond
+      (= (get-expr-type exp1) ::conj) (let [[expr1 expr2] (expr-value exp1 ::conj)]
+                                        (conjunction
+                                          (distribution (disjunction expr1 exp2))
+                                          (distribution (disjunction expr2 exp2))))
+      (= (get-expr-type exp2) ::conj) (let [[expr1 expr2] (expr-value exp2 ::conj)]
+                                        (conjunction
+                                          (distribution (disjunction exp1 expr1))
+                                          (distribution (disjunction exp1 expr2))))
+      :else (disjunction exp1 exp2))))
+(defmethod distribution ::conj [exp]
+  (let [[exp1 exp2] (expr-value exp ::conj)
+        exp1 (distribution exp1)
+        exp2 (distribution exp2)]
+    (cond
+      (= (get-expr-type exp1) ::disj) (let [[expr1 expr2] (expr-value exp1 ::disj)]
+                                        (disjunction
+                                          (distribution (conjunction expr1 exp2))
+                                          (distribution (conjunction expr2 exp2))))
+      (= (get-expr-type exp2) ::disj) (let [[expr1 expr2] (expr-value exp2 ::disj)]
+                                        (disjunction
+                                          (distribution (conjunction exp1 expr1))
+                                          (distribution (conjunction exp1 expr2))))
+      :else (conjunction exp1 exp2))))
+
+
+(defn dnf [exp]
+  (distribution (elementary-function exp)))
+
+
+
+
+
 

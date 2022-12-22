@@ -7,34 +7,25 @@
 
 (defn calculate [expr variables]
   (expr-evaluator expr variables))
+
 (def test-vars-values
   (hash-map
     :x true
     :y false))
 (def test-expr
+  "(X v False) & (X -> Y)"
   (conjunction
     (disjunction (variable :x) (constant false))
-    (implication (variable :y) (variable :y))))
+    (implication (variable :x) (variable :y))))
+
+(def test-expr2
+  (invert (invert (invert (invert (constant false))))))
 
 
-;(println (calculate test-expr test-vars-values))
+(println test-expr)
+(println test-vars-values)
+(println (dnf test-expr))
+(println (dnf test-expr2))
+(println (calculate test-expr test-vars-values))
+(println (calculate (dnf test-expr) test-vars-values))
 
-
-
-(defn dnf
-  "Применить ДНФ"
-  [expr]
-  (cond
-    (empty? expr) expr
-    (elementary-function? expr) expr
-    (almost-elementary? expr) (cons (first expr) (list (dnf (second expr)) (dnf (last expr))))
-    (implication? expr) (disjunction (invert (second expr)) (last expr))
-    (and (invert? expr) (or (conjunction? (last expr)) (disjunction? (last expr)))) (dnf (de-morgan (last expr)))
-    (and (invert? expr) (invert? (last expr))) (delete-invert expr)
-    (or (and (conjunction? expr) (or (disjunction? (second expr)) (disjunction? (last expr))))
-        (and (disjunction? expr) (or (conjunction? (second expr)) (conjunction? (last expr))))) (recur-distribution expr)
-    (reduceable? expr) (reducing expr)
-    (or (conjunction? expr) (disjunction? expr)) (dnf (cons (first expr) (list (dnf (second expr)) (dnf (last expr)))))
-    :else (dnf (list (first expr) (dnf (last expr))))))
-
-;(dnf (invert (disjunction (implication (variable :x) (variable :y)) (invert (implication (variable :y) (variable :z))))))
